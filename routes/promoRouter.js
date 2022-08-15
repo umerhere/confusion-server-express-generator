@@ -1,72 +1,83 @@
 const express = require('express'), 
     bodyParser = require('body-parser'); 
 const promoRouter = express.Router();
+const Promos = require('../models/promos');
 
 promoRouter.use(bodyParser.json());
-/* We are grouping all the end points for the route /promoes defined in index.js */
-dishRouter.route('/:dishId/comments')
-.get((req,res,next) => {
-    Dishes.findById(req.params.dishId)
-    .then((dish) => {
-        if (dish != null) {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.json(dish.comments);
-        }
-        else {
-            err = new Error('Dish ' + req.params.dishId + ' not found');
-            err.status = 404;
-            return next(err);
-        }
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-.post((req, res, next) => {
-    Dishes.findById(req.params.dishId)
-    .then((dish) => {
-        if (dish != null) {
-            dish.comments.push(req.body);
-            dish.save()
-            .then((dish) => {
+
+/* We are grouping all the end points for the route /promos defined in index.js */
+promoRouter.route('/:promoId?')
+    .get((req, res, next) => {
+        if (req.params.promoId) {
+            Promos.findById(req.params.promoId)
+            .then((promo) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
-            }, (err) => next(err));
-        }
-        else {
-            err = new Error('Dish ' + req.params.dishId + ' not found');
-            err.status = 404;
-            return next(err);
-        }
-    }, (err) => next(err))
-    .catch((err) => next(err));
-})
-.put((req, res, next) => {
-    res.statusCode = 403;
-    res.end('PUT operation not supported on /dishes/'
-        + req.params.dishId + '/comments');
-})
-.delete((req, res, next) => {
-    Dishes.findById(req.params.dishId)
-    .then((dish) => {
-        if (dish != null) {
-            for (var i = (dish.comments.length -1); i >= 0; i--) {
-                dish.comments.id(dish.comments[i]._id).remove();
-            }
-            dish.save()
-            .then((dish) => {
+                res.json(promo);
+            }, (err) => next(err))
+            .catch((err) => next(err));
+        } else {
+            Promos.find({})
+            .then((promos) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
-            }, (err) => next(err));
+                res.json(promos);
+            }, (err) => next(err))
+            .catch((err) => next(err));
         }
-        else {
-            err = new Error('Dish ' + req.params.dishId + ' not found');
-            err.status = 404;
-            return next(err);
+    })
+
+    .post((req, res, next) => {
+        if (req.params.promoId) {
+            res.statusCode = 403;
+            res.end('POST operation not supported on /promos/'+ req.params.promoId);
+        } else {
+            Promos.create(req.body)
+            .then((promo) => {
+                console.log('promo Created ', promo);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promo);
+            }, (err) => next(err))
+            .catch((err) => next(err));
         }
-    }, (err) => next(err))
-    .catch((err) => next(err));    
-});
+    })
+
+    .put((req, res, next) => {
+        if (req.params.promoId) {
+            Promos.findByIdAndUpdate(req.params.promoId, {
+                $set: req.body
+            }, { new: true })
+            .then((promo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promo);
+            }, (err) => next(err))
+            .catch((err) => next(err));
+        } else {
+            res.statusCode = 403;
+            res.end('PUT method is not supported on /promos');
+        }
+    })
+
+    .delete((req, res, next) => {
+        if (req.params.promoId) {
+            Promos.findByIdAndRemove(req.params.promoId)
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));
+        } else {
+            Promos.remove({})
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));    
+        }
+    });
 
 module.exports = promoRouter
