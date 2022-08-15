@@ -14,7 +14,7 @@ const leaderSchema = new Schema({
         type: String,
         require: true
     },
-    abbr: { //testCOmment
+    abbr: {
         type: String,
         require: true
     },
