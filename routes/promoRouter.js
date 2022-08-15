@@ -4,47 +4,69 @@ const promoRouter = express.Router();
 
 promoRouter.use(bodyParser.json());
 /* We are grouping all the end points for the route /promoes defined in index.js */
-promoRouter.route('/:promoId?')
-    .all((req, res, next) => { //this will be invoked for all requests from /promoes endpoint (no matter if its GET, POST, PUT, DELETE. All requests from /promoes will be handled here)
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next(); //will pass the req res params for /promoes endpoint to next method, which is in our case is app.get for /promoes
-        })
-
-    .get((req, res, next) => {
-            if (req.params.promoId) {
-                res.end('Will send you back details of the promo: ' + req.params.promoId);
-            } else {
-                res.end('Will send you back all the promoes soon');
-            }
-        })
-
-    .post((req, res, next) => {
-            if (req.params.promoId) {
-                res.statusCode = 403;
-                res.end('POST method is not supported on /promoes/'+ req.params.promoId);
-            } else {
-                res.end('Will add the promoes: ' + req.body.name + ' with details ' + req.body.description);
-            }
-        })
-
-    .put((req, res, next) => {
-            if (req.params.promoId) {
-                res.write('Updating the promo: ' + req.params.promoId + '\n');
-                res.end('will update the promo: ' + req.body.name + ' with details ' + req.body.description);
-            } else {
-                res.statusCode = 403;
-                res.end('PUT method is not supported on /promoes');
-            }
-        })
-
-    .delete((req, res, next) => {
-        if (req.params.promoId) {
-            res.end('Deleting promo: ' + req.params.promoId);
-
-        } else {
-            res.end('Will delete all the promoes');
+dishRouter.route('/:dishId/comments')
+.get((req,res,next) => {
+    Dishes.findById(req.params.dishId)
+    .then((dish) => {
+        if (dish != null) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(dish.comments);
         }
-        });
+        else {
+            err = new Error('Dish ' + req.params.dishId + ' not found');
+            err.status = 404;
+            return next(err);
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+.post((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+    .then((dish) => {
+        if (dish != null) {
+            dish.comments.push(req.body);
+            dish.save()
+            .then((dish) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(dish);                
+            }, (err) => next(err));
+        }
+        else {
+            err = new Error('Dish ' + req.params.dishId + ' not found');
+            err.status = 404;
+            return next(err);
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+.put((req, res, next) => {
+    res.statusCode = 403;
+    res.end('PUT operation not supported on /dishes/'
+        + req.params.dishId + '/comments');
+})
+.delete((req, res, next) => {
+    Dishes.findById(req.params.dishId)
+    .then((dish) => {
+        if (dish != null) {
+            for (var i = (dish.comments.length -1); i >= 0; i--) {
+                dish.comments.id(dish.comments[i]._id).remove();
+            }
+            dish.save()
+            .then((dish) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(dish);                
+            }, (err) => next(err));
+        }
+        else {
+            err = new Error('Dish ' + req.params.dishId + ' not found');
+            err.status = 404;
+            return next(err);
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));    
+});
 
 module.exports = promoRouter
