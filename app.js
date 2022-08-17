@@ -12,7 +12,6 @@ const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 
 const mongoose = require('mongoose');
-const Dishes = require('./models/dishes');
 
 const url = 'mongodb://localhost:27017/confusion';
 const connect = mongoose.connect(url);
@@ -32,38 +31,55 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
+//Lets use signed cookie. We are using this value 12345-67890-09876-54321 as our signature 
+app.use(cookieParser('12345-67890-09876-54321')); 
 
 function auth (req, res, next) {
   console.log(req.headers);
-  var authHeader = req.headers.authorization;
-  if (!authHeader) { //if its null,  means no username password given
-      var err = new Error('You are not authenticated!');
-      res.setHeader('WWW-Authenticate', 'Basic');
-      err.status = 401;
-      next(err);//here we are sending the err to client 
-      //the server will send client a response in this form -> HTTP/1.1 401 Unauthorized WWW-Authorize: Basic
-      return;
-  }
-  
-  /*Now to access a page index.html, the client have to send the server a request in this form -> GET/index.html HTTP/1.1 Authorization: Basic Base64EcnodedString Host: www.cse.ust.uk
-    Where Base64EcnodedString contains username and password */
-  
-  //Creating the ubove commented request below
-  /*here, authHeader = Basic Base64EcnodedString. We're splitting it on space, the whole string will convert into array as "[0] = Basic & [1] = Base64EcnodedString"
-   and we're accessing the 1st index that would be Base64EcnodedString and again spliting it as Base64EcnodedString contains username and passowrd in 
-   the form -> username:password */
-  var auth = new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-  var user = auth[0];
-  var pass = auth[1];
-  if (user == 'admin' && pass == 'password') {
+  console.log(req.signedCookies);
+
+  if (!req.signedCookies.user) {
+    var authHeader = req.headers.authorization;
+    if (!authHeader) { //if its null,  means no username password given
+        var err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        next(err);//here we are sending the err to client 
+        //the server will send client a response in this form -> HTTP/1.1 401 Unauthorized WWW-Authorize: Basic
+        return;
+    }
+    
+    /*Now to access a page index.html, the client have to send the server a request in this form -> GET/index.html HTTP/1.1 Authorization: Basic Base64EcnodedString Host: www.cse.ust.uk
+      Where Base64EcnodedString contains username and password */
+    
+    //Creating the ubove commented request below
+    /*here, authHeader = Basic Base64EcnodedString. We're splitting it on space, the whole string will convert into array as "[0] = Basic & [1] = Base64EcnodedString"
+     and we're accessing the 1st index that would be Base64EcnodedString and again spliting it as Base64EcnodedString contains username and passowrd in 
+     the form -> username:password */
+    var auth = new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    var user = auth[0];
+    var pass = auth[1];
+    if (user == 'admin' && pass == 'password') {
+      res.cookie('user', 'admin', { signed: true}) //We are creating cookie of name user
       next(); // authorized, Now, we are good to go down to run the following middlewares
+    } else {
+      var err = new Error('You are not authenticated');
+      res.setHeader('WWW-Autheticate', 'Basic');
+      err.status = 401;
+      next(err); //here we are sending the err to client 
+    }
   } else {
-    var err = new Error('You are not authenticated');
-    res.setHeader('WWW-Autheticate', 'Basic');
-    err.status = 401;
-    next(err); //here we are sending the err to client 
+    if (req.signedCookies.user === 'admin') {
+      next(); //Authenticated, good to go
+    } else {
+      var err = new Error('You are not authenticated');
+      res.setHeader('WWW-Autheticate', 'Basic');
+      err.status = 401;
+      next(err); //here we are sending the err to client 
+    }
   }
+  
 }
 
 //All ubove middlewares run till this point
