@@ -7,8 +7,7 @@ var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
+var usersRouter = require('./routes/userRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
@@ -45,53 +44,28 @@ app.use(session({
   store: new FileStore()
 }));
 
+/* We have moved it here so that login/signup takes place before authentication ( public routes ) */
+app.use('/users', usersRouter);
+app.use('/', indexRouter);
 
 function auth (req, res, next) {
-  console.log(req.headers);
-  //console.log(req.signedCookies);
   console.log(req.session);
 
-  if (!req.session.user) {
-    var authHeader = req.headers.authorization;
-    if (!authHeader) { //if its null,  means no username password given
-        var err = new Error('You are not authenticated!');
-        res.setHeader('WWW-Authenticate', 'Basic');
-        err.status = 401;
-        next(err);//here we are sending the err to client 
-        //the server will send client a response in this form -> HTTP/1.1 401 Unauthorized WWW-Authorize: Basic
-        return;
-    }
-    
-    /*Now to access a page index.html, the client have to send the server a request in this form -> GET/index.html HTTP/1.1 Authorization: Basic Base64EcnodedString Host: www.cse.ust.uk
-      Where Base64EcnodedString contains username and password */
-    
-    //Creating the ubove commented request below
-    /*here, authHeader = Basic Base64EcnodedString. We're splitting it on space, the whole string will convert into array as "[0] = Basic & [1] = Base64EcnodedString"
-     and we're accessing the 1st index that would be Base64EcnodedString and again spliting it as Base64EcnodedString contains username and passowrd in 
-     the form -> username:password */
-    var auth = new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    var user = auth[0];
-    var pass = auth[1];
-    if (user == 'admin' && pass == 'password') {
-      req.session.user = 'admin';
-      next(); // authorized, Now, we are good to go down to run the following middlewares
-    } else {
-      var err = new Error('You are not authenticated');
-      res.setHeader('WWW-Autheticate', 'Basic');
-      err.status = 401;
-      next(err); //here we are sending the err to client 
-    }
-  } else {
-    if (req.session.user === 'admin') {
-      next(); //Authenticated, good to go
-    } else {
-      var err = new Error('You are not authenticated');
-      res.setHeader('WWW-Autheticate', 'Basic');
-      err.status = 401;
-      next(err); //here we are sending the err to client 
-    }
+if(!req.session.user) {
+    var err = new Error('You are not authenticated 1!');
+    err.status = 403;
+    return next(err);
+}
+else {
+  if (req.session.user === 'authenticated') {
+    next();
   }
-  
+  else {
+    var err = new Error('You are not authenticated sadasd !');
+    err.status = 403;
+    return next(err);
+  }
+}
 }
 
 //All ubove middlewares run till this point
@@ -99,8 +73,6 @@ app.use(auth); //Authentication, if true the next middlewares (lines) will be ac
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/promos', promoRouter);
 app.use('/leaders', leaderRouter);
