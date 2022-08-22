@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require('passport');
+var authenticate = require('./authenticate');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRouter');
@@ -44,28 +46,26 @@ app.use(session({
   store: new FileStore()
 }));
 
+/*  see /login route. there, passport.authenticate('local') will be called, if it gets true, it will add a User property in the req
+      and User.serialize() will be called to store the req.User.username and req.User.password in the session*/
+app.use(passport.initialize());
+app.use(passport.session());
+
 /* We have moved it here so that login/signup takes place before authentication ( public routes ) */
 app.use('/users', usersRouter);
 app.use('/', indexRouter);
 
 function auth (req, res, next) {
-  console.log(req.session);
-
-if(!req.session.user) {
-    var err = new Error('You are not authenticated 1!');
-    err.status = 403;
-    return next(err);
-}
-else {
-  if (req.session.user === 'authenticated') {
-    next();
+  console.log(req.user);
+  //req.user is added by passport.authenticate('local') in /login route
+  if(!req.user) {
+      var err = new Error('You are not authenticated 1!');
+      err.status = 403;
+      return next(err);
   }
   else {
-    var err = new Error('You are not authenticated sadasd !');
-    err.status = 403;
-    return next(err);
+    next();
   }
-}
 }
 
 //All ubove middlewares run till this point
