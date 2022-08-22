@@ -9,7 +9,7 @@ Base64EcnodedString contains the username and password once the user is authenti
 
 ##### Cookies and Express Sessions
 
-To use ** signed cookie **, We are using this value 12345-67890-09876-54321 as our signature, now once the user is logged in through Basic Auth, we will store the username and password in our cookies so that the username and passowrd is checked next time the user logs in
+To use **signed cookie**, We are using this value 12345-67890-09876-54321 as our signature, now once the user is logged in through Basic Auth, we will store the username and password in our cookies so that the username and passowrd is checked next time the user logs in
 
 For ** sessions **, almost same mechanism works except, in express sessions, when user logs in, we get a session file created in our project under sessions directory which contains username and password. A new session under cookie is created if you see it on postman
 
