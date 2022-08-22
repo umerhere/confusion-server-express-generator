@@ -1,11 +1,24 @@
-#ATHENTICATION
+# ATHENTICATION
 
 ## Strategies of authenticating a user
 
 ##### Basic Authentication
 
+You simply pass username and password in authentication headers (FOR POSTMAN, select Basic Auth from headers)
+Base64EcnodedString contains the username and password once the user is authenticated
+
 ##### Cookies and Express Sessions
 
+To use ** signed cookie **, We are using this value 12345-67890-09876-54321 as our signature, now once the user is logged in through Basic Auth, we will store the username and password in our cookies so that the username and passowrd is checked next time the user logs in
+
+For ** sessions **, almost same mechanism works except, in express sessions, when user logs in, we get a session file created in our project under sessions directory which contains username and password. A new session under cookie is created if you see it on postman
+
+** DIFFERENCE ** 
+A session is stored on the server. A cookie is stored as a file on your computer by your browser. A session cookie () is stored on your computer which is used by the server to track individual user sessions
+Cookie is not dependent on session, but Session is dependent on Cookie.
+The maximum cookie size is 4KB whereas in session, you can store as much data as you like.
+Cookie does not have a function named unsetcookie() (THE COOKIES creator can set the expiry time of cookie tho) while in Session you can use Session_destroy(); which is used to destroy all registered data or to unset some
+Cookie ends depending on the lifetime you set for it while a session ends when a user closes his browser
 
 ##### Passport
 ###### About
