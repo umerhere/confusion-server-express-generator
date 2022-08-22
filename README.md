@@ -72,3 +72,45 @@ Earlier, we used to create **session** after local-strategy authenticates the us
 4. In dishRouter, POST method is secure, so verifyUser is called from authenticate.js
 5. VerifyUser is called from authenticate.js . passport.authenticate uses jwtStrategy created ubove with name jwtPassport. In jwtPassport, options are passed in which, first we extract token. This is how the JWT Strategy authenticates the user.
 
+# MONGOOSE
+
+We have created a data folder where all the documents will be stored
+Now to run the mongoDB server, type : **mongod --dbpath=data --bind_ip 127.0.0.1**
+Now to access the server, open another terminal and type **mongo**
+	This should allow us to access the server
+**COMMANDS**
+	run db : this will tell us the database we'are connected to
+	run use confusion  : this will create a new database named confusion
+	run db.help() : will list all the available commands 
+	
+	run db.dihses.insert({"name": "Uthappizza", "description": "Test"}) : Now we'are already in confusion database, 
+		if confusion has collection named dishes, we'll select it otherwise this command will create the new collection
+	run db.dishes.find() or db.dishes.find().pretty() : to view all the data inside collection dishes
+    
+## MONGOOSE POPULATION. JOINS IN MONGODB?
+
+In mongoDB, we don't have joins, instead we can store reference to other documents within a document by using ObjectIds
+
+If we can reference another document into our document using objectIds then mongoose helps us to do **population** of this information from the other document into the current document. This is called **mongoose population**
+
+```python
+#EXAMPLE
+#we have dishes field, inside dishes we have comments document
+var comment = new Schema({
+    rating: { type: Number, required: true},
+    content: { type: String, required: true},
+    author: {
+        type: mongoose.Schema.Types.ObjectId, #this field will now contain an ObjectId which is reference to a user document
+        ref: 'User' #this specifies that schema of document you refering ubove is of the type User schema
+    }
+})
+
+#Now when you ask mongoose to populate this comment document, it will populate the author field from the user document
+Dishes.find({}) #find specific dish
+.populate('comment.author') #this call will go and fetch from the database each individual author record and take that user record and then populate it into the dishes document
+.then((err, dish))
+#Expensive Operation...
+```
+
+**ILLUSTRATION OF UBOVE CODE**
+Suppose You want to fetch a dish with its comments (comments has author field). You'll first get the dish with **find({}) method**, this will give you the comments as well (because we have added comments as a sub document of dish document, rather than creating a ObjectId field of comments as well) and Now you want the author of the comments from database. Now **populate** will iterate over users table and fetch that specific user for us. 
