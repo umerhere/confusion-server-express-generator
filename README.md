@@ -74,17 +74,28 @@ Earlier, we used to create **session** after local-strategy authenticates the us
 
 # MONGOOSE
 
+## BASICS
+
 We have created a data folder where all the documents will be stored
+
 Now to run the mongoDB server, type : **mongod --dbpath=data --bind_ip 127.0.0.1**
+
 Now to access the server, open another terminal and type **mongo**
+
 	This should allow us to access the server
+
 **COMMANDS**
+
 	run db : this will tell us the database we'are connected to
+
 	run use confusion  : this will create a new database named confusion
+
 	run db.help() : will list all the available commands 
 	
 	run db.dihses.insert({"name": "Uthappizza", "description": "Test"}) : Now we'are already in confusion database, 
-		if confusion has collection named dishes, we'll select it otherwise this command will create the new collection
+
+		if confusion has collection nam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ed dishes, we'll select it otherwise this command will create the new collection
+
 	run db.dishes.find() or db.dishes.find().pretty() : to view all the data inside collection dishes
     
 ## MONGOOSE POPULATION. JOINS IN MONGODB?
@@ -113,4 +124,5 @@ Dishes.find({}) #find specific dish
 ```
 
 **ILLUSTRATION OF UBOVE CODE**
+
 Suppose You want to fetch a dish with its comments (comments has author field). You'll first get the dish with **find({}) method**, this will give you the comments as well (because we have added comments as a sub document of dish document, rather than creating a ObjectId field of comments as well) and Now you want the author of the comments from database. Now **populate** will iterate over users table and fetch that specific user for us. 
