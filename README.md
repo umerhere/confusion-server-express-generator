@@ -40,3 +40,35 @@ Passport itself adds a user property to the request message. So req.user becomes
 - Also provides serialization and deserialization for sessions
     
 **LOCAL STRATEGY simplified: local strategy uses passport-local and further passport-local-mongoose plugin for authentication**
+
+**WEB TOKENS**
+
+With cookie based authentication, we notice that cookies are stored on the client side, and the cookies are included in **every outgoing request** message whereby, the server is reminded about that specific client, by extracting information from the cookie. Cookie can be used together with sessions, whereby the cookies store the session ID, and then when the server receives the incoming request from the cookie, it extracts the session ID and uses that as an index into the server-side session store to retrieve the session information for the particular client. Now, this approach as I said, is not very scalable because if you have **thousands of sessions**, the server needs to keep track of all these **thousands of sessions on the server side**.
+
+**Problems with Session-based authentications and WEB-BASED Tokens**
+-Needs stateless servers
+-Mobile Application does not handle session based authentication very well. The app running on mobile and web won't do well with session based authenticaiton. This is where we need **Web Tokens**. Furthermore, token-based authentication also helps us to deal with what are called **CORS** or **CSRF** problems
+
+**JWT** is such a web based signed token. Morever, JWT tokens are more most suited for REST servers
+
+**JWT Strategy**
+We'll use jwt-strategy for jwt authentication. Before you create token, **YOU NEED ANOTHER STRATEGY FIRST TO AUTHENTICATE, IF AUTHENTICATION IS SUCCESSFULL, THEN JWT TOKEN WILL BE CREATED** . In our project, we'll first authenticate user's username and password with **LOCAL STRATEGY**, if successfull, then we'll create **JWT-TOKEN**
+
+Earlier, we used to create **session** after local-strategy authenticates the user, now we'll create a *JWT TOKEN* after the local strategy authenticates.
+
+**STEPS TO USE JWT AUHTENTICATION IN CODE**
+1. Install "passport-jwt": "^4.0.0" and "jsonwebtoken": "^8.3.0"
+2. Create config.js in root directory, this will have basic configration like secretKey and mongoURL
+3. Create authenticate.js file. See all the methods we have created there.
+4. Since we using jwt instead of sessions, remove sessions from app.js file. Also remove the auth function from routes. We'll add the authentication on routes in each route file.
+5. In userRoutes, the JWT will be created after the PASSPORT-LOCAL-STRATEGY authenticates the username and password. Once authenticated by local strategy, we'll get the token in response
+6. When testing on postman, Copy the JWT token from response as it will be needed to add on authentication header with request.
+7. Now for GET requests, no authentication is required. While for POST, PUT, DELETE, add authentication on each endpoint's routes file. JWT verifyUser method will verify the JWT you added earlier (6th step) in the authentication header.
+
+**HOW JWT AUTHENTICATION WORKS?**
+1. In userRoutes, User access /login route and gives username and password in the req body.
+2. Local strategy authenticates the username and password. if true, it calls getToken function and adds the token in response.
+3. We paste the token in authentication headers and call any protected routes (let say, we call POST /dish)
+4. In dishRouter, POST method is secure, so verifyUser is called from authenticate.js
+5. VerifyUser is called from authenticate.js . passport.authenticate uses jwtStrategy created ubove with name jwtPassport. In jwtPassport, options are passed in which, first we extract token. This is how the JWT Strategy authenticates the user.
+

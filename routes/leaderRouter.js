@@ -2,6 +2,7 @@ const express = require('express'),
     bodyParser = require('body-parser'); 
 const leaderRouter = express.Router();
 const Leaders = require('../models/leaders');
+const authenticate = require('../authenticate');
 
 leaderRouter.use(bodyParser.json());
 /* We are grouping all the end points for the route /leaders defined in index.js */
@@ -26,7 +27,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         if (req.params.leaderId) {
             res.statusCode = 403;
             res.end('POST operation not supported on /leaders/'+ req.params.leaderId);
@@ -42,7 +43,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         if (req.params.leaderId) {
             Leaders.findByIdAndUpdate(req.params.leaderId, {
                 $set: req.body
@@ -59,7 +60,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         if (req.params.leaderId) {
             Leaders.findByIdAndRemove(req.params.leaderId)
             .then((resp) => {

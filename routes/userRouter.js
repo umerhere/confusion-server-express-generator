@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var Users = require('../models/users');
 var passport = require('passport');
 var router = express.Router();
+var authenticate = require('../authenticate');
 
 router.use(bodyParser.json());
 
@@ -37,9 +38,12 @@ router.post('/signup', (req, res, next) => {
   earlier, we were passing the username and password in the authentication header  */
 //now passport.authenticate('local') will run first, if successfull, then next callback will be called
 router.post('/login', passport.authenticate('local'), (req, res) => {
+
+  //passport.authenticate('local') will give us req.user upon success
+  var token = authenticate.getToken({_id: req.user._id}) //you can add the other info like username, etc etc but its suggested to keep the token short. _id is sufficient for everything
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'Login Successful!'});
+  res.json({success: true,  token: token, status: 'Login Successful!'});
 })
 
 router.get('/logout', (req, res, next) => {
