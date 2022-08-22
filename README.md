@@ -104,6 +104,7 @@ In mongoDB, we don't have joins, instead we can store reference to other documen
 
 If we can reference another document into our document using objectIds then mongoose helps us to do **population** of this information from the other document into the current document. This is called **mongoose population**
 
+```python
     #EXAMPLE
     #we have dishes field, inside dishes we have comments document
     var comment = new Schema({
@@ -120,6 +121,7 @@ If we can reference another document into our document using objectIds then mong
     .populate('comment.author') #this call will go and fetch from the database each individual author record and take that user record and then populate it into the dishes document
     .then((err, dish))
     #Expensive Operation...
+```
 
 **ILLUSTRATION OF UBOVE CODE**
 
