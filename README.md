@@ -18,7 +18,7 @@ For **sessions**, almost same mechanism works except, in express sessions, when 
 - Cookie does not have a function named unsetcookie() (THE COOKIES creator can set the expiry time of cookie tho) while in Session you can use Session_destroy(); which is used to destroy all registered data or to unset some
 - Cookie ends depending on the lifetime you set for it while a session ends when a user closes his browser
 
-##### Passport
+## PASSPORT
 
 Paasport is an authentication middleware which supports various strategies that can be used for user authentication, including a local strategy like using username and password, or even third party authentication or using OAuth or OAuth 2.0, like using Facebook, Twitter, or Google+, and so on.
 **Basic Authentication & Cookies/Sessions** involves a lot of repetitive code and repetitive tasks handling errors and devising ways of checking the user authentication and then authenticating the user and so on. All this is simplified within **Passport** using various strategies that can be used for authenticating users.
