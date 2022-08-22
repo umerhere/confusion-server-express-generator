@@ -1,13 +1,11 @@
-# ATHENTICATION
+# AUTHENTICATION
 
-## Strategies of authenticating a user
-
-##### Basic Authentication
+## Basic Authentication
 
 You simply pass username and password in authentication headers (FOR POSTMAN, select Basic Auth from headers)
 Base64EcnodedString contains the username and password once the user is authenticated
 
-##### Cookies and Express Sessions
+## Cookies and Express Sessions
 
 To use **signed cookie**, We are using this value 12345-67890-09876-54321 as our signature, now once the user is logged in through Basic Auth, we will store the username and password in our cookies so that the username and passowrd is checked next time the user logs in
 
@@ -26,6 +24,7 @@ Paasport is an authentication middleware which supports various strategies that 
 **Basic Authentication & Cookies/Sessions** involves a lot of repetitive code and repetitive tasks handling errors and devising ways of checking the user authentication and then authenticating the user and so on. All this is simplified within **Passport** using various strategies that can be used for authenticating users.
 
 **PASSPORT simplified: Password is authentication middleware with several authentication strategies like local strategy, 0ath, webTokens**
+
 **Local Strategy** is based upon registering users into your system using a username and password, and then thereafter authenticating them using the username and password.
 
 **USAGE**
@@ -35,9 +34,9 @@ Passport itself adds a user property to the request message. So req.user becomes
 
 **For Local Strategy**, we install passport-local. Furthermore for local strategy, we have a plugin called **passport-local-mongoose** which makes it even more flexible for login/signup with various methods.
 **Passport-local-mongoose**
-    stores username and password. The password is stored in hashed form
-        Store a user and see it in db shell. you'll notice salt and hash instead of passowrd field. 
-            The salt is used as a way of encrypting the password and then stores the hashed password in hash field
-    Also provides serialization and deserialization for sessions
+- stores username and password. The password is stored in hashed form
+- Store a user and see it in db shell. you'll notice salt and hash instead of passowrd field. 
+- The salt is used as a way of encrypting the password and then stores the hashed password in hash field
+- Also provides serialization and deserialization for sessions
     
 **LOCAL STRATEGY simplified: local strategy uses passport-local and further passport-local-mongoose plugin for authentication**
