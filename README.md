@@ -82,7 +82,7 @@ Now to run the mongoDB server, type : **mongod --dbpath=data --bind_ip 127.0.0.1
 
 Now to access the server, open another terminal and type **mongo**
 
-	This should allow us to access the server
+This should allow us to access the server
 
 **COMMANDS**
 
@@ -104,24 +104,22 @@ In mongoDB, we don't have joins, instead we can store reference to other documen
 
 If we can reference another document into our document using objectIds then mongoose helps us to do **population** of this information from the other document into the current document. This is called **mongoose population**
 
-```python
-#EXAMPLE
-#we have dishes field, inside dishes we have comments document
-var comment = new Schema({
-    rating: { type: Number, required: true},
-    content: { type: String, required: true},
-    author: {
-        type: mongoose.Schema.Types.ObjectId, #this field will now contain an ObjectId which is reference to a user document
-        ref: 'User' #this specifies that schema of document you refering ubove is of the type User schema
-    }
-})
+    #EXAMPLE
+    #we have dishes field, inside dishes we have comments document
+    var comment = new Schema({
+        rating: { type: Number, required: true},
+        content: { type: String, required: true},
+        author: {
+            type: mongoose.Schema.Types.ObjectId, #this field will now contain an ObjectId which is reference to a user document
+            ref: 'User' #this specifies that schema of document you refering ubove is of the type User schema
+        }
+    })
 
-#Now when you ask mongoose to populate this comment document, it will populate the author field from the user document
-Dishes.find({}) #find specific dish
-.populate('comment.author') #this call will go and fetch from the database each individual author record and take that user record and then populate it into the dishes document
-.then((err, dish))
-#Expensive Operation...
-```
+    #Now when you ask mongoose to populate this comment document, it will populate the author field from the user document
+    Dishes.find({}) #find specific dish
+    .populate('comment.author') #this call will go and fetch from the database each individual author record and take that user record and then populate it into the dishes document
+    .then((err, dish))
+    #Expensive Operation...
 
 **ILLUSTRATION OF UBOVE CODE**
 
