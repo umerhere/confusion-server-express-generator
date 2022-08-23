@@ -4,6 +4,14 @@ var passportLocalMongoose = require('passport-local-mongoose')
 
 const userSchema = new Schema({
     //username and password will be provided by passport-local-mongoose
+    firstname: {
+        type: String,
+        default: ''
+    },
+    lastname: {
+        type: String,
+        default: ''
+    },
     admin: {
         type: Boolean,
         default: false

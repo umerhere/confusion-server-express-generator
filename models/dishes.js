@@ -17,8 +17,9 @@ const commentSchema = new Schema({
         require: true
     },
     author: {
-        type: String,
-        require: true
+        /* Check README -> Mongoose Population */
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
 }, {
     timestamps: true
@@ -57,6 +58,7 @@ const dishSchema = new Schema({
     },
     comments: [commentSchema]
 }, {
+    usePushEach: true, //push is deprecated by mongoose, I'm using usePushEach flag in dishSchema to make it work
     timestamps: true
 });
 
