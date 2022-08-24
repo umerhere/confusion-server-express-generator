@@ -44,3 +44,7 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
 
 //read README.md for better understanding
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = (user) => {
+    return user.admin ? true : false;
+}

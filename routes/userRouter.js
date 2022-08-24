@@ -8,8 +8,20 @@ var authenticate = require('../authenticate');
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, function(req, res, next) {
+  if (authenticate.verifyAdmin(req.user)) {
+    Users.find({})
+    .then((leaders) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leaders);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+  } else {
+    err = new Error('Only Admin users can perform this operation');
+    err.status = 403;
+    return next(err);
+  }
 });
 
 router.post('/signup', (req, res, next) => {
