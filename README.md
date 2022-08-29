@@ -145,5 +145,6 @@ OpenSSL (a command line tool, already installed on mac and linux) is used for cr
 4. Now, do ls in bin folder. You should see the private key and certficate in there
 5. Do the changes in WWW and APP.js file to setup the server and you are good to go.
 
-**WARNING BY CHROME**
+**WARNING BY CHROME**:
+
 When you will access the https://localhost:3443/ URL, chrome will send you the warning **Your connection is not private**. It is because the certificate we are using is a self signed certificate and its not recognized by chrome as a valid certificate. We know this is our server and there's nothing harmful in there but otherwise, never ever **PROCEED** with this warning. 
