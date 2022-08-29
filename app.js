@@ -28,6 +28,17 @@ connect.then((db) => {
 
 var app = express();
 
+app.all('*', (req, res, next) => { //* means for ALL the requests
+  if(req.secure) { //req comming from secure port has .secure attribute with them
+     return next();
+  } else {
+    //Now redirect the Http request to Https server
+    //req have these values used below
+    //307 means target resource resides on a different URI
+    res.redirect(307, 'https://' + req.hostname + ":" + app.get('secPort') + req.url)
+  }
+})
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

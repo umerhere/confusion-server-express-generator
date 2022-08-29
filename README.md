@@ -126,3 +126,24 @@ Dishes.find({}) #find specific dish
 **ILLUSTRATION OF UBOVE CODE**
 
 Suppose You want to fetch a dish with its comments (comments has author field). You'll first get the dish with **find({}) method**, this will give you the comments as well (because we have added comments as a sub document of dish document, rather than creating a ObjectId field of comments as well) and Now you want the author of the comments from database. Now **populate** will iterate over users table and fetch that specific user for us. 
+
+
+# HTTPS
+
+
+To make our server secure, We need to create a private key and a certificate in order to encrypt/decrypt the messages.
+To create a private key and certificate, go to bin folder and do ls. You'll notice the www file that'll b used to create private key and certificate.
+OpenSSL (a command line tool, already installed on mac and linux) is used for creating the key and certificate.
+
+
+## STEPS for creating private key and certificate
+1. cd bin and type openssl genrsa 1024 > private.key //A new private key is created
+2. openssl req -new -key private.key -out cert.csr //request for a new certificate. 
+//Asnwer a few question after u run the ubolve command
+//this will create a cert.csr file. using this, we'll create the certificate (next command)
+3. openssl x509 -req -in cert.csr -signkey private.key -out certificate.pem //this will generate the certificate for us
+4. Now, do ls in bin folder. You should see the private key and certficate in there
+5. Do the changes in WWW and APP.js file to setup the server and you are good to go.
+
+**WARNING BY CHROME**
+When you will access the https://localhost:3443/ URL, chrome will send you the warning **Your connection is not private**. It is because the certificate we are using is a self signed certificate and its not recognized by chrome as a valid certificate. We know this is our server and there's nothing harmful in there but otherwise, never ever **PROCEED** with this warning. 

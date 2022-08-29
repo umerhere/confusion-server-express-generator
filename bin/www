@@ -7,13 +7,15 @@
 var app = require('../app');
 var debug = require('debug')('confusionserver:server');
 var http = require('http');
-
+var https = require('https');
+var fs = require('fs')
 /**
  * Get port from environment and store in Express.
  */
 
 var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+app.set('port', port); //http is running at port 80
+app.set('secPort', port+443); //https is running at port 3443 (3000 + 443) as 443 is a reserve port
 
 /**
  * Create HTTP server.
@@ -29,6 +31,20 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+var options = {
+  //readFileSync means that the file will be synced completely before going further
+  key: fs.readFileSync(__dirname + '/private.key'), //__dirname means current directory. We'll look for private.key in the current directory
+  cert: fs.readFileSync(__dirname + '/certificate.pem')
+};
+
+var secureServer = https.createServer(options, app)
+
+secureServer.listen(app.get('secPort'), () => {
+  console.log("Secure Server listening on port ", app.get('secPort'));
+}) //secPort defined ubove
+
+secureServer.on('error', onError); //defined down below
+secureServer.on('listening', onListening); //defined down below
 /**
  * Normalize a port into a number, string, or false.
  */
