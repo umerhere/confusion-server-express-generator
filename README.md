@@ -148,3 +148,7 @@ OpenSSL (a command line tool, already installed on mac and linux) is used for cr
 **WARNING BY CHROME**:
 
 When you will access the https://localhost:3443/ URL, chrome will send you the warning **Your connection is not private**. It is because the certificate we are using is a self signed certificate and its not recognized by chrome as a valid certificate. We know this is our server and there's nothing harmful in there but otherwise, never ever **PROCEED** with this warning. 
+
+**POSTMAN CONFIGRATION FOR SELFSIGNED SSL**
+
+Since, we have created a self signed token ubove. It is not recognized by chrome as well as on **postman**. To test self signed https servers on POSTMAN, disable SSL verification from settings of postman
