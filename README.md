@@ -154,7 +154,7 @@ Since, we have created a self signed token ubove. It is not recognized by chrome
 
 # CORS - Cross Origin Resource Sharing
 
-## Same Origin Policy
+**Same Origin Policy**
 
 lets say, your site is http://www.abc.com/xyz/page.html
 
