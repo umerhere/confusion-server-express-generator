@@ -3,11 +3,15 @@ const express = require('express'),
 const leaderRouter = express.Router();
 const Leaders = require('../models/leaders');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 leaderRouter.use(bodyParser.json());
 /* We are grouping all the end points for the route /leaders defined in index.js */
 leaderRouter.route('/:leaderId?')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => {
+        res.sendStatus(200);
+    })
+    .get(cors.cors, (req, res, next) => {
         if (req.params.leaderId) {
             Leaders.findById(req.params.leaderId)
             .then((leader) => {
@@ -27,7 +31,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.leaderId) {
                 res.statusCode = 403;
@@ -49,7 +53,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.leaderId) {
                 Leaders.findByIdAndUpdate(req.params.leaderId, {
@@ -72,7 +76,7 @@ leaderRouter.route('/:leaderId?')
         }
     })
 
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.leaderId) {
                 Leaders.findByIdAndRemove(req.params.leaderId)

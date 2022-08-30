@@ -4,6 +4,7 @@ const dishRouter = express.Router();
 const authenticate = require('../authenticate');
 
 const Dishes = require('../models/dishes');
+const cors = require('./cors');
 
 dishRouter.use(bodyParser.json());
 
@@ -12,7 +13,10 @@ dishRouter.use(bodyParser.json());
 // GET REQUEST is public, while for put, delete and post, we need to authenticate the user
 
 dishRouter.route('/')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+.get(cors.cors, (req,res,next) => {
     Dishes.find({})
     .then((dishes) => {
         res.statusCode = 200;
@@ -21,7 +25,7 @@ dishRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser,  (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser,  (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         Dishes.create(req.body)
         .then((dish) => {
@@ -37,7 +41,7 @@ dishRouter.route('/')
         return next(err);
     }
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         res.statusCode = 403;
         res.end('PUT operation not supported on /dishes');
@@ -47,7 +51,7 @@ dishRouter.route('/')
         return next(err);
     }
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         Dishes.remove({})
         .then((resp) => {
@@ -62,9 +66,11 @@ dishRouter.route('/')
         return next(err);
     }
 });
-
 dishRouter.route('/:dishId')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+.get(cors.cors, (req,res,next) => {
     Dishes.findById(req.params.dishId)
     .populate('comments.author') //dishes will now have author from user document now
     .then((dish) => {
@@ -74,7 +80,7 @@ dishRouter.route('/:dishId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         res.statusCode = 403;
         res.end('POST operation not supported on /dishes/'+ req.params.dishId);
@@ -84,7 +90,7 @@ dishRouter.route('/:dishId')
         return next(err);
     }
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         Dishes.findByIdAndUpdate(req.params.dishId, {
             $set: req.body
@@ -101,7 +107,7 @@ dishRouter.route('/:dishId')
         return next(err);
     }
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         Dishes.findByIdAndRemove(req.params.dishId)
         .then((resp) => {
@@ -116,9 +122,11 @@ dishRouter.route('/:dishId')
         return next(err);
     }
 });
-
 dishRouter.route('/:dishId/comments')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+.get(cors.cors, (req,res,next) => {
     Dishes.findById(req.params.dishId)
     .populate('comments.author') //dishes will now have author from user document now
     .then((dish) => {
@@ -135,7 +143,7 @@ dishRouter.route('/:dishId/comments')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null) {
@@ -163,12 +171,12 @@ dishRouter.route('/:dishId/comments')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /dishes/'
         + req.params.dishId + '/comments');
 })
-.delete(authenticate.verifyUser, (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     if (authenticate.verifyAdmin(req.user)) {
         Dishes.findById(req.params.dishId)
         .then((dish) => {
@@ -196,9 +204,11 @@ dishRouter.route('/:dishId/comments')
         return next(err);
     }      
 });
-
 dishRouter.route('/:dishId/comments/:commentId')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+.get(cors.cors, (req,res,next) => {
     Dishes.findById(req.params.dishId)
     .populate('comments.author') //dishes will now have author from user document now
     .then((dish) => {
@@ -220,12 +230,12 @@ dishRouter.route('/:dishId/comments/:commentId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('POST operation not supported on /dishes/'+ req.params.dishId
         + '/comments/' + req.params.commentId);
 })
-.put(authenticate.verifyUser, (req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (JSON.stringify(dish.comments.id(req.params.commentId).author) === JSON.stringify(req.user._id)) {
@@ -265,7 +275,7 @@ dishRouter.route('/:dishId/comments/:commentId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete(authenticate.verifyUser,     (req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser,     (req, res, next) => {
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (JSON.stringify(dish.comments.id(req.params.commentId).author) === JSON.stringify(req.user._id)) { //dish.comments.id(req.params.commentId).author & req.user._id were of object types

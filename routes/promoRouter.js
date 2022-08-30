@@ -3,12 +3,16 @@ const express = require('express'),
 const promoRouter = express.Router();
 const Promos = require('../models/promos');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 promoRouter.use(bodyParser.json());
 
 /* We are grouping all the end points for the route /promos defined in index.js */
 promoRouter.route('/:promoId?')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => {
+        res.sendStatus(200);
+    })
+    .get(cors.cors, (req, res, next) => {
         if (req.params.promoId) {
             Promos.findById(req.params.promoId)
             .then((promo) => {
@@ -28,7 +32,7 @@ promoRouter.route('/:promoId?')
         }
     })
 
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.promoId) {
                 res.statusCode = 403;
@@ -50,7 +54,7 @@ promoRouter.route('/:promoId?')
         }
     })
 
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.promoId) {
                 Promos.findByIdAndUpdate(req.params.promoId, {
@@ -73,7 +77,7 @@ promoRouter.route('/:promoId?')
         }
     })
 
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (authenticate.verifyAdmin(req.user)) {
             if (req.params.promoId) {
                 Promos.findByIdAndRemove(req.params.promoId)

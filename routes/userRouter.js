@@ -4,11 +4,13 @@ var Users = require('../models/users');
 var passport = require('passport');
 var router = express.Router();
 var authenticate = require('../authenticate');
+const cors = require('./cors');
 
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', authenticate.verifyUser, function(req, res, next) {
+
+router.get('/', cors.corsWithOptions, authenticate.verifyUser, function(req, res, next) {
   if (authenticate.verifyAdmin(req.user)) {
     Users.find({})
     .then((leaders) => {
@@ -24,7 +26,7 @@ router.get('/', authenticate.verifyUser, function(req, res, next) {
   }
 });
 
-router.post('/signup', (req, res, next) => {
+router.post('/signup', cors.corsWithOptions, (req, res, next) => {
 
   //passport-local-mongoose provide the method of register
   /*we are expecting username and passowrd to be passed in the body of request, 
@@ -61,7 +63,7 @@ router.post('/signup', (req, res, next) => {
 /*we are expecting username and passowrd to be passed in the body of request, 
   earlier, we were passing the username and password in the authentication header  */
 //now passport.authenticate('local') will run first, if successfull, then next callback will be called
-router.post('/login', passport.authenticate('local'), (req, res) => {
+router.post('/login', cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
 
   //passport.authenticate('local') will give us req.user upon success
   var token = authenticate.getToken({_id: req.user._id}) //you can add the other info like username, etc etc but its suggested to keep the token short. _id is sufficient for everything

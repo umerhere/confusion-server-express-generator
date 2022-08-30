@@ -130,7 +130,6 @@ Suppose You want to fetch a dish with its comments (comments has author field). 
 
 # HTTPS
 
-
 To make our server secure, We need to create a private key and a certificate in order to encrypt/decrypt the messages.
 To create a private key and certificate, go to bin folder and do ls. You'll notice the www file that'll b used to create private key and certificate.
 OpenSSL (a command line tool, already installed on mac and linux) is used for creating the key and certificate.
@@ -152,3 +151,36 @@ When you will access the https://localhost:3443/ URL, chrome will send you the w
 **POSTMAN CONFIGRATION FOR SELFSIGNED SSL**
 
 Since, we have created a self signed token ubove. It is not recognized by chrome as well as on **postman**. To test self signed https servers on POSTMAN, disable SSL verification from settings of postman
+
+# CORS - Cross Origin Resource Sharing
+
+## Same Origin Policy
+
+lets say, your site is http://www.abc.com/xyz/page.html
+
+Same origin policy says that you can access any resource if these are not changed
+1. Protocol
+2. Port
+3. Hostname
+
+Now , try to access a page at address 
+
+1. http://www.abc.com/abc/page2.html. We'll get **success** as  neither of the ubove 3 conditions failed
+2. http://www.abc.com/abc/def/test/locals/index.php. We'll get **success** as  neither of the ubove 3 conditions failed
+3. https://www.abc.com/abc/def/test/locals/index.php. We'll get **failure** as  protocol is changed (We are using HTTP and trying to access the resource at HTTPS Protocol)
+4. http://www.abc.com:123/abc/def/test/locals/index.php We'll get **failure** as  port is changed (We are using standard port and trying to access the resource at port 123)
+5. http://store.abc.com/mno/index.php. We'll get **failure** as  hostname is changed (We are using host www.abc.com and trying to access the resource with hostname store.abc.com)
+
+**CORS** enables web servers to perform cross domain/origin requests
+
+A request is considered a **CROSS ORIGIN REQUEST** if you're trying to access a resource from a different domain, protocol or port number.
+
+**CORS** is a mechanism that gives web servers cross domain controls.
+
+Browser and server can interact with each other and determine wether or not its safe to allow the cross origin request.
+
+Our server should also be setup to respond with some headers required to determine the cross origin requests.
+
+**NOTE**
+
+I've applied cors on all the routes. Now, When you'll send any request, **Access-Control-Allow-Origin** will be avaible in headers. For GET OPERATIONS, new additional setting will be required in order to test it via postman. However, for **POST, PUT AND DELETE**, we'll need to add a **Origin** field (**its value will be same as one of the allowed addresses you defined in cors.js whitelist array**) in the header while testing it with postman. However, this field is set automatically when we hit the API with browser. 
